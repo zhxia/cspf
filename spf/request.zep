@@ -1,4 +1,4 @@
-namespace Spf\Core;
+namespace Spf;
 
 class Request implements RequestInterface
 {

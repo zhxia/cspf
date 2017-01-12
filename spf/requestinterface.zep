@@ -1,4 +1,4 @@
-namespace Spf\Core;
+namespace Spf;
 interface RequestInterface
 {
     public function get(string! name,defaultValue=null);

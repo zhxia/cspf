@@ -1,4 +1,4 @@
-namespace Spf\Core;
+namespace Spf;
 
 class Loader implements LoaderInterface
 {
@@ -37,12 +37,12 @@ class Loader implements LoaderInterface
         let self::_configPath = path;
     }
 
-    public static function getConfig(string! filename="common") ->var|null
+    public static function getConfig(string! filename="common") ->var
     {
         var confFile,config,configArray=null;
         let confFile=self::_configPath."/".filename.".php";
         if file_exists(confFile) {
-            if  isset(self::_configItems[filename]){
+            if  isset self::_configItems[filename] {
                 let configArray = self::_configItems[filename];
             }
             else{
@@ -58,7 +58,9 @@ class Loader implements LoaderInterface
     {
         var configArray,value=null;
         let configArray = self::getConfig(filename);
-        fetch value,configArray[name];
-        return value;
+        if fetch value,configArray[name] {
+            return value;
+        }
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-namespace Spf\Core;
+namespace Spf;
 
 class Dispatcher implements DispatchInterface {
     private _request;
