@@ -4,12 +4,7 @@ class Dispatcher implements DispatchInterface {
     private _request;
     private _response;
     private _router;
-    private static _instance=null;
-
-    private function __construct()
-    {
-
-    }
+    private _view;
 
     public function setRouter(<RouterInterface> router)
     {
@@ -41,16 +36,32 @@ class Dispatcher implements DispatchInterface {
         return this->_response;
     }
 
-    public static function getInstance()-> <DispatchInterface>
+    public function setView(<ViewInterface> view)
     {
-        if self::_instance===null {
-            let self::_instance=new self();
-        }
-        return self::_instance;
+        let this->_view=view;
+    }
+
+    public function getView() -> <ViewInterface>
+    {
+        return this->_view;
     }
 
     public function dispatch()
     {
-
+        var controllerClass,controller,result;
+        let controllerClass = this->_router->mapping();
+        let controller=new {controllerClass};
+        while true
+        {
+            let result = controller->execute();
+            if result instanceof ControllerInterface {
+                let controller = result;
+                continue;
+            }
+            break;
+        }
+        if is_string(result) {
+            this->_view->display(result);
+        }
     }
 }
