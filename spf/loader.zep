@@ -2,26 +2,28 @@ namespace Spf;
 
 class Loader implements LoaderInterface
 {
-    private static _namespaces=[];
+    private static _namespace=[];
     private static _configPath=null;
     private static _configItems=[];
 
-    public static function addNameSpace(string! root,string! path) -> void
+    public static function registerNameSpace(string! name,string! path) -> void
     {
-        let self::_namespaces[root] = path;
+        let self::_namespace=["name":name,"path":path];
     }
 
+    public static function getNameSpace(){
+        return self::_namespace;
+    }
 
     public static function autoload(string! className) -> bool
     {
-        var arrSeg,root,path,classFile;
+        var arrSeg,path,classFile;
         if class_exists(className,false) {
             return false;
         }
         let arrSeg = explode("\\",className,2);
         if isset arrSeg[1] {
-            let root = arrSeg[0];
-            if fetch path,self::_namespaces[root] {
+            if fetch path,self::_namespace["path"] {
                 let classFile = path."/".str_replace("\\","/",arrSeg[1]).".php";
                 if !file_exists(classFile) {
                     throw new Exception("class file:'".classFile."' doesn't exist!");

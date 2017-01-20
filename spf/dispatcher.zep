@@ -50,6 +50,7 @@ class Dispatcher implements DispatchInterface {
     {
         var controllerClass,controller,result;
         let controllerClass = this->_router->mapping();
+        echo controllerClass;
         let controller=new {controllerClass};
         while true
         {

@@ -32,17 +32,17 @@ class Router implements RouterInterface
     }
 
     /**
+    * url: /user/show/1
     *自动映射
     **/
     public function autoMapping(string! url)->string|null
     {
-        var arrSeg,filename;
-        var ret=null;
+        var arrSeg,filename,ret;
         let url=trim(url,"/");
         if url !="" {
             let arrSeg=explode("/",url);
             let filename=array_pop(arrSeg);
-            let ret="Controllers\\".(count(arrSeg)>0?implode("\\",arrSeg):"")."\\".ucfirst(filename);
+            let ret="\\Controllers\\".(count(arrSeg)>0?implode("\\",arrSeg):"")."\\".ucfirst(filename);
         }
         return ret;
     }
@@ -54,6 +54,7 @@ class Router implements RouterInterface
     {
         var routeConfig,cls,val,pattern,matches;
         let routeConfig=Loader::getConfig("route");
+        print_r(routeConfig);
         if !empty routeConfig {
             for cls,val in routeConfig {
                 for pattern in val{
