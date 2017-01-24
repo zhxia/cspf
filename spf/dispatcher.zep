@@ -5,6 +5,17 @@ class Dispatcher implements DispatchInterface {
     private _response;
     private _router;
     private _view;
+    private _loader;
+
+    public function setLoader(<LoaderInterface> loader)
+    {
+        let this->_loader=loader;
+    }
+
+    public function getLoader() -> <LoaderInterface>
+    {
+        return this->_loader;
+    }
 
     public function setRouter(<RouterInterface> router)
     {
@@ -48,14 +59,15 @@ class Dispatcher implements DispatchInterface {
 
     public function dispatch()
     {
-        var controllerClass,controller,result;
-        let controllerClass = this->_router->mapping();
-        echo controllerClass;
+        var controllerClass,controller,result,localNameSpace;
+        let localNameSpace=this->_loader->getLocalNameSpace();
+        let controllerClass = localNameSpace."\\".this->_router->mapping();
         let controller=new {controllerClass};
         while true
         {
             let result = controller->execute();
-            if result instanceof ControllerInterface {
+
+            if typeof result=="object" && result instanceof ControllerInterface {
                 let controller = result;
                 continue;
             }

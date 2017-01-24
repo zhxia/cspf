@@ -42,7 +42,7 @@ class Router implements RouterInterface
         if url !="" {
             let arrSeg=explode("/",url);
             let filename=array_pop(arrSeg);
-            let ret="\\Controllers\\".(count(arrSeg)>0?implode("\\",arrSeg):"")."\\".ucfirst(filename);
+            let ret="Controllers\\".(count(arrSeg)>0?implode("\\",arrSeg):"")."\\".filename;
         }
         return ret;
     }
@@ -52,14 +52,14 @@ class Router implements RouterInterface
     **/
     private function manualMapping(string! url)->string|null
     {
-        var routeConfig,cls,val,pattern,matches;
-        let routeConfig=Loader::getConfig("route");
-        print_r(routeConfig);
+        var routeConfig,cls,val,pattern,matches,dispatcher;
+        let dispatcher=Application::getInstance()->getDispatcher();
+        let routeConfig=dispatcher->getLoader()->getConfig("route");
         if !empty routeConfig {
             for cls,val in routeConfig {
                 for pattern in val{
                     if preg_match(pattern,url,matches) {
-                        return cls;
+                        return "Controllers\\".cls;
                     }
                 }
             }
