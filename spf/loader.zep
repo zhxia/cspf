@@ -48,6 +48,7 @@ class Loader implements LoaderInterface
     public function setConfigPath(string! path)
     {
         let this->_configPath = path;
+        return this;
     }
 
     public function getConfig(string! filename="common") ->var

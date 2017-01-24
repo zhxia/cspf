@@ -39,7 +39,7 @@ class Application {
     {
         var arrConf,requestClass,responseClass,viewClass,routerClass,view,loader;
         let loader=new Loader();
-        this->_dispatcher->getLoader(loader);
+        this->_dispatcher->setLoader(loader);
         spl_autoload_register([loader,"autoload"]);
         let arrConf = loader->getConfig("common");
         if !fetch requestClass,arrConf["request_class"] {
