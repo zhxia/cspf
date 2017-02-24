@@ -5,7 +5,7 @@ class Loader implements LoaderInterface
     private _namespaces=[];
     private _configPath=null;
     private _configItems=[];
-    private _localNameSpace;
+    private _appNameSpace;
 
     public function addNameSpace(string! root,string! path) -> <Loader>
     {
@@ -13,15 +13,15 @@ class Loader implements LoaderInterface
         return this;
     }
 
-    public function setLocalNameSpace(string! root) -> <Loader>
+    public function setAppNameSpace(string! name) -> <Loader>
     {
-        let this->_localNameSpace = root;
+        let this->_appNameSpace = name;
         return this;
     }
 
-    public function getLocalNameSpace() -> string
+    public function getAppNameSpace() -> string
     {
-        return this->_localNameSpace;
+        return this->_appNameSpace;
     }
 
     public function autoload(string! className) -> bool
@@ -38,8 +38,10 @@ class Loader implements LoaderInterface
                 if !file_exists(classFile) {
                     throw new Exception("class file:[".classFile."] not found!");
                 }
-                require classFile;
-                return true;
+                else{
+                    require classFile;
+                    return true;
+                }
             }
         }
         return false;

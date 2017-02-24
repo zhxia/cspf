@@ -59,9 +59,9 @@ class Dispatcher implements DispatchInterface {
 
     public function dispatch()
     {
-        var controllerClass,controller,result,localNameSpace;
-        let localNameSpace=this->_loader->getLocalNameSpace();
-        let controllerClass = localNameSpace."\\".this->_router->mapping();
+        var controllerClass,controller,result,appNameSpace;
+        let appNameSpace=this->_loader->getAppNameSpace();
+        let controllerClass = appNameSpace."\\".this->_router->mapping();
         let controller=new {controllerClass};
         while true
         {
