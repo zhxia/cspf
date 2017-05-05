@@ -2,44 +2,71 @@ namespace Spf;
 
 class Loader implements LoaderInterface
 {
-    private _namespaces=[];
-    private _configPath=null;
-    private _configItems=[];
-    private _appNameSpace;
+    private _namespaces=null;
+    private _files=null;
+    private _classes=null;
+    private _directories=null;
+    private _registered=false;
 
-    public function addNameSpace(string! root,string! path) -> <Loader>
+    public function register() -><Loader>
     {
-        let this->_namespaces[root] = path;
-        return this;
-    }
-
-    public function setAppNameSpace(string! name) -> <Loader>
-    {
-        let this->_appNameSpace = name;
-        return this;
-    }
-
-    public function getAppNameSpace() -> string
-    {
-        return this->_appNameSpace;
-    }
-
-    public function autoload(string! className) -> bool
-    {
-        var arrSeg,root,path,classFile;
-        if class_exists(className,false) {
-            return false;
+        if this->_registered === false {
+            this->loadFiles();
+            spl_autoload_register([this,"autoLoad"]);
+            let this->_registered=true;
         }
-        let arrSeg = explode("\\",className,2);
-        if isset arrSeg[1] {
-            let root=arrSeg[0];
-            if fetch path,this->_namespaces[root] {
-                let classFile = path."/".strtolower(str_replace("\\","/",arrSeg[1])).".php";
-                if !file_exists(classFile) {
-                    throw new Exception("class file:[".classFile."] not found!");
+        return this;
+    }
+
+    public function unRegister() -><Loader>
+    {
+        if this->_registered === true {
+            spl_autoload_unregister([this,"autoLoad"]);
+            let this->_registered=false;
+        }
+        return this;
+    }
+
+    public function autoLoad(string! className) -> boolean
+    {
+        var filePath,ds,ns,nsPrefix,directories,filename,directory;
+        if typeof this->_classes == "array" {
+            if fetch filePath,this->_classes[className] {
+                if is_file(filePath){
+                    require filePath;
+                    return true;
                 }
-                else{
-                    require classFile;
+            }
+        }
+
+        let ds=DIRECTORY_SEPARATOR,ns="\\";
+        if typeof this->_namespaces == "array" {
+            for nsPrefix,directories in this->_namespaces {
+                if !starts_with(className,nsPrefix) {
+                    continue;
+                }
+                let filename = substr(className,strlen(nsPrefix . ns));
+                let filename = str_replace(ns,ds,filename).".php";
+                if !filename {
+                    continue;
+                }
+                for directory in directories {
+                    let directory = rtrim(directory,ds).ds;
+                    let filePath = directory.filename;
+                    if is_file(filePath){
+                        require filePath;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        if typeof this->_directories == "array" {
+            for directory in this->_directories {
+                let directory=rtrim(directory,ds).ds;
+                let filePath = directory.str_replace(ns,ds,className).".php";
+                if is_file(filePath){
+                    require filePath;
                     return true;
                 }
             }
@@ -47,36 +74,82 @@ class Loader implements LoaderInterface
         return false;
     }
 
-    public function setConfigPath(string! path)
+    public function loadFiles()
     {
-        let this->_configPath = path;
+        var filePath;
+        if typeof this->_files == "array" {
+            for filePath in this->_files {
+                if is_file(filePath) {
+                    require filePath;
+                }
+            }
+        }
+    }
+
+    public function registerDirs(array! directories,boolean merge=false) -> <Loader>
+    {
+        if merge && typeof this->_directories == "array" {
+            let this->_directories = array_merge(this->_directories,directories);
+        }
+        else{
+            let this->_directories = directories;
+        }
         return this;
     }
 
-    public function getConfig(string! filename="common") ->var
+    public function registerClasses(array! classes,boolean merge=false)-><Loader>
     {
-        var confFile,config,configArray=null;
-        let confFile=this->_configPath."/".filename.".php";
-        if file_exists(confFile) {
-            if  isset this->_configItems[filename] {
-                let configArray = this->_configItems[filename];
-            }
-            else{
-                let config = new Config(require confFile);
-                let configArray = config->toArray();
-                let this->_configItems[filename]=configArray;
-            }
+        if merge && typeof this->_classes == "array" {
+            let this->_classes=array_merge(this->_classes,classes);
         }
-        return configArray;
+        else{
+            let this->_classes=classes;
+        }
+        return this;
     }
 
-    public function getConfigItem(string! name,string filename="common") -> var|null
+    public function registerFiles(array! files,boolean merge=false)-><Loader>
     {
-        var configArray,value=null;
-        let configArray = this->getConfig(filename);
-        if fetch value,configArray[name] {
-            return value;
+        if merge && typeof this->_files == "array" {
+           let this->_files=array_merge(this->_files,files);
         }
-        return null;
+        else{
+           let this->_files=files;
+        }
+        return this;
+    }
+
+    public function registerNamespaces(array! namespaces,boolean merge=false) -> <Loader>
+    {
+        var preparedNamespaces,name,paths;
+        let preparedNamespaces=this->prepareNamespace(namespaces);
+        if merge && typeof this->_namespaces == "array" {
+            for name,paths in preparedNamespaces {
+                if !isset this->_namespaces[name]{
+                    let this->_namespaces[name]=[];
+                }
+                let this->_namespaces=array_merge(this->_namespaces,paths);
+            }
+        }
+        else{
+            let this->_namespaces=preparedNamespaces;
+        }
+        return this;
+    }
+
+    protected function prepareNamespace(array! namespaces)->array
+    {
+        var name,paths,localPaths,result;
+        let result=[];
+        for  name,paths in namespaces {
+            if typeof paths != "array" {
+                let localPaths = [paths];
+            }
+            else{
+                let localPaths = paths;
+            }
+            let result[name]=localPaths;
+        }
+        return result;
     }
 }
