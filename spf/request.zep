@@ -2,6 +2,17 @@ namespace Spf;
 
 class Request implements RequestInterface
 {
+    protected _matches;
+    public function setRouterMatches(matches)
+    {
+        let this->_matches = matches;
+    }
+
+    public function getRouterMatches()
+    {
+        return this->_matches;
+    }
+
     public function get(string! name,var defaultValue=null){
         return this->getHelper(_REQUEST,name,defaultValue);
     }

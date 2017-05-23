@@ -1,7 +1,6 @@
 namespace Spf;
 class Response implements ResponseInterface
 {
-
     public function setHeader(string name,string value,httpResponseCode=null,string separator=":") -> <Response>
     {
         header(name.separator.value,true,httpResponseCode);

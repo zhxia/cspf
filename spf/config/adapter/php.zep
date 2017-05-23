@@ -14,7 +14,7 @@ class Php extends Config {
    public function __construct(string! filePath)
     {
         if is_file(filePath) === false {
-            throw Exception("file \"".filePath."\" not found!");
+            throw new Exception("file \"".filePath."\" not found!");
         }
 
         parent::__construct(require filePath);

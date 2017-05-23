@@ -1,21 +1,20 @@
 namespace Spf;
 
 class View implements ViewInterface {
-    private _viewFile;
-    private _viewPath;
-    private _vars=[];
-    private _layoutFile;
-    private _tpl;
-    private _dispatcher;
+    protected _viewFile;
+    protected _viewDir;
+    protected _vars=[];
+    protected _layoutFile;
+    protected _tpl;
 
     public function setLayoutFile(string! layoutFile)
     {
         let this->_layoutFile = layoutFile;
     }
 
-    public function setViewPath(string! viewPath)
+    public function setViewDir(string! viewDir)
     {
-        let this->_viewPath = viewPath;
+        let this->_viewDir = viewDir;
     }
 
     public function assign(string! name,var value)
@@ -76,24 +75,24 @@ class View implements ViewInterface {
         return returnValue;
     }
 
-    public function getSubView() -> string
+    public function getContent() -> string
     {
         return this->renderView(this->_tpl);
     }
 
     protected function renderView(string! viewFile) -> string
-        {
-            var viewContent;
-            let viewFile=this->_viewPath.DIRECTORY_SEPARATOR.viewFile.".phtml";
-            if !file_exists(viewFile){
-                throw new Exception("view file [".viewFile."] not found!");
-            }
-            ob_start();
-            extract(this->_vars);
-            require viewFile;
-            let viewContent = ob_get_contents();
-            ob_end_clean();
-            return viewContent;
+    {
+        var viewContent;
+        let viewFile=this->_viewDir.DIRECTORY_SEPARATOR.viewFile.".phtml";
+        if !file_exists(viewFile){
+            throw new Exception("view file [".viewFile."] not found!");
         }
+        ob_start();
+        extract(this->_vars);
+        require viewFile;
+        let viewContent = ob_get_contents();
+        ob_end_clean();
+        return viewContent;
+    }
 
 }

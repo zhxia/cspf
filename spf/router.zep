@@ -52,13 +52,16 @@ class Router implements RouterInterface
     **/
     private function manualMapping(string! url)->string|null
     {
-        var routeConfig,cls,val,pattern,matches,dispatcher;
-        let dispatcher=Application::getInstance()->getDispatcher();
-        let routeConfig=dispatcher->getLoader()->getConfig("route");
+        var app,routeConfig,cls,val,pattern,matches,dispatcher;
+        let app=Application::getInstance();
+        let dispatcher=app->getDispatcher();
+        let routeConfig=app->getConfig("route");
         if !empty routeConfig {
             for cls,val in routeConfig {
                 for pattern in val{
-                    if preg_match(pattern,url,matches) {
+                    let matches=null; //由于是引用，需要先初始化
+                    if preg_match("#".pattern."#i",url,matches) {
+                        dispatcher->getRequest()->setRouterMatches(matches);
                         return "Controllers\\".cls;
                     }
                 }
