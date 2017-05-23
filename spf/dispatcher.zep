@@ -112,22 +112,22 @@ class Dispatcher implements DispatchInterface {
         for plugin in this->_plugins {
             switch step{
                 case Plugin::STEP_ROUTER_STARTUP:
-                    plugin->routerStartup();
+                    plugin->routerStartup(this->_request,this->_response);
                     break;
                 case Plugin::STEP_ROUTER_SHUTDOWN:
-                    plugin->routerShutdown();
+                    plugin->routerShutdown(this->_request,this->_response);
                     break;
                 case Plugin::STEP_DISPATCH_LOOP_STARTUP:
-                    plugin->dispatchLoopStartup();
+                    plugin->dispatchLoopStartup(this->_request,this->_response);
                     break;
                 case Plugin::STEP_DISPATCH_STARTUP:
-                    plugin->dispatchStartup();
+                    plugin->dispatchStartup(this->_request,this->_response);
                     break;
                 case Plugin::STEP_DISPATCH_SHUTDOWN:
-                    plugin->dispatchShutdown();
+                    plugin->dispatchShutdown(this->_request,this->_response);
                     break;
                 case plugin::STEP_DISPATCH_LOOP_SHUTDOWN:
-                    plugin->dispatchLoopShutdown();
+                    plugin->dispatchLoopShutdown(this->_request,this->_response);
                     break;
             }
         }
@@ -141,7 +141,7 @@ class Dispatcher implements DispatchInterface {
         var interceptor;
         if step == Interceptor::INVOKE_BEFORE {
             for interceptor in this->_interceptors {
-                if interceptor->before() != Interceptor::STEP_CONTINUE {
+                if interceptor->before(this->_request,this->_response) != Interceptor::STEP_CONTINUE {
                     break;
                 }
             }
@@ -149,7 +149,7 @@ class Dispatcher implements DispatchInterface {
         if step == Interceptor::INVOKE_AFTER {
             let this->_interceptors = array_reverse(this->_interceptors);
             for interceptor in this->_interceptors {
-                if interceptor->after() != Interceptor::STEP_CONTINUE {
+                if interceptor->after(this->_request,this->_response) != Interceptor::STEP_CONTINUE {
                     break;
                 }
             }
